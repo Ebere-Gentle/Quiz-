@@ -370,9 +370,467 @@
                 });
                 questionGrid.appendChild(number);
             }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Science Quiz Challenge</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap">
+    <style>
+        :root {
+            --science-blue: #0a4a7a;
+            --science-green: #2ecc71;
+            --science-purple: #9b59b6;
+            --science-orange: #e67e22;
+            --science-red: #e74c3c;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .background-slideshow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+        
+        .background-slideshow img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        
+        .background-slideshow img.active {
+            opacity: 0.7;
+        }
+        
+        .quiz-container {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 800px;
+            padding: 30px;
+            backdrop-filter: blur(5px);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.5s ease;
+        }
+        
+        .quiz-container.hidden {
+            transform: translateY(-100vh);
+        }
+        
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 0 0 10px var(--science-purple);
+            font-size: 2.5rem;
+        }
+        
+        .timer-container {
+            position: fixed;
+            top: 20px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            z-index: 100;
+        }
+        
+        .timer-display {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px 30px;
+            border-radius: 50px;
+            font-size: 1.5rem;
+            font-family: 'Orbitron', sans-serif;
+            color: white;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            display: none;
+        }
+        
+        .timer-btn {
+            background: linear-gradient(135deg, var(--science-blue), var(--science-purple));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 101;
+        }
+        
+        .timer-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        .question-container {
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        #question-text {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            line-height: 1.5;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid var(--science-green);
+        }
+        
+        .question-number-display {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: linear-gradient(135deg, var(--science-blue), var(--science-purple));
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .option-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            color: white;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .option-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .option-btn.correct {
+            background-color: var(--science-green);
+            animation: pulse 0.5s;
+        }
+        
+        .option-btn.incorrect {
+            background-color: var(--science-red);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .plus-two {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            color: var(--science-green);
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(46, 204, 113, 0.7);
+            opacity: 0;
+            animation: fadeInOut 2s;
+            z-index: 100;
+        }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .nav-btn {
+            background-color: var(--science-purple);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .question-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        
+        .question-popup.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .question-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            max-width: 600px;
+            padding: 30px;
+        }
+        
+        .question-number {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--science-blue), var(--science-purple));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .question-number:hover {
+            animation: spinBounce 0.8s ease;
+            transform: scale(1.1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        @keyframes spinBounce {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1.1); }
+        }
+        
+        .time-up {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            color: var(--science-red);
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(231, 76, 60, 0.7);
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .time-up.active {
+            opacity: 1;
+            animation: pulse 1s infinite;
+        }
+        
+        @media (max-width: 768px) {
+            .question-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-slideshow">
+        <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" class="active" alt="Science background 1">
+        <img src="https://images.unsplash.com/photo-1562724296-1e55d038a27d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Science background 2">
+        <img src="https://images.unsplash.com/photo-1507413245164-61604daf548f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Science background 3">
+        <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Science background 4">
+    </div>
+    
+    <button class="timer-btn" id="timer-btn">Start Timer</button>
+    
+    <div class="timer-container">
+        <div class="timer-display" id="timer-display">29</div>
+    </div>
+    
+    <div class="quiz-container" id="quiz-container">
+        <h1>Science Quiz Challenge</h1>
+        
+        <div class="question-container">
+            <div class="question-number-display" id="question-number">1</div>
+            <div id="question-text">Question will appear here</div>
+            <div id="options-container" class="options-grid">
+                <!-- Options will be added by JavaScript -->
+            </div>
+        </div>
+        
+        <div class="nav-buttons">
+            <button id="next-btn" class="nav-btn">Next Question</button>
+            <button id="select-btn" class="nav-btn">Select Question</button>
+        </div>
+        
+        <div id="plus-two" class="plus-two hidden">+2</div>
+        
+        <audio id="correct-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3"></audio>
+        <audio id="wrong-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"></audio>
+    </div>
+    
+    <div class="question-popup" id="question-popup">
+        <div class="question-grid">
+            <!-- Question numbers will be added by JavaScript -->
+        </div>
+    </div>
+    
+    <div class="time-up" id="time-up">TIME UP!</div>
+
+    <script>
+        // Sample questions - replace with your WPS document questions
+        const questions = [
+            {
+                question: "What is the chemical symbol for water?",
+                options: ["H2O", "CO2", "NaCl", "O2"],
+                answer: "H2O"
+            },
+            {
+                question: "Which planet is known as the Red Planet?",
+                options: ["Venus", "Mars", "Jupiter", "Saturn"],
+                answer: "Mars"
+            },
+            // Add 18 more questions following the same format
+            // ...
+            {
+                question: "What is the powerhouse of the cell?",
+                options: ["Nucleus", "Mitochondria", "Ribosome", "Chloroplast"],
+                answer: "Mitochondria"
+            }
+        ];
+        
+        // Fill with 20 questions total
+        while (questions.length < 20) {
+            questions.push({
+                question: `Sample Science Question ${questions.length + 1}`,
+                options: ["Option A", "Option B", "Option C", "Option D"],
+                answer: "Option B"
+            });
+        }
+        
+        // DOM Elements
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const nextBtn = document.getElementById('next-btn');
+        const selectBtn = document.getElementById('select-btn');
+        const plusTwo = document.getElementById('plus-two');
+        const correctSound = document.getElementById('correct-sound');
+        const wrongSound = document.getElementById('wrong-sound');
+        const questionPopup = document.getElementById('question-popup');
+        const questionGrid = document.querySelector('.question-grid');
+        const quizContainer = document.getElementById('quiz-container');
+        const timerBtn = document.getElementById('timer-btn');
+        const timerDisplay = document.getElementById('timer-display');
+        const timeUpDisplay = document.getElementById('time-up');
+        const questionNumberDisplay = document.getElementById('question-number');
+        const backgroundSlideshow = document.querySelector('.background-slideshow');
+        const backgroundImages = document.querySelectorAll('.background-slideshow img');
+        
+        // Quiz variables
+        let currentQuestionIndex = 0;
+        let timer;
+        let countdown;
+        let backgroundInterval;
+        let timerRunning = false;
+        
+        // Initialize the quiz
+        function initQuiz() {
+            // Populate question numbers grid
+            for (let i = 0; i < questions.length; i++) {
+                const number = document.createElement('div');
+                number.className = 'question-number';
+                number.textContent = i + 1;
+                number.addEventListener('click', () => {
+                    currentQuestionIndex = i;
+                    questionNumberDisplay.textContent = i + 1;
+                    showQuestion();
+                    questionPopup.classList.remove('active');
+                });
+                questionGrid.appendChild(number);
+            }
+            
+            // Start background slideshow
+            startBackgroundSlideshow();
             
             // Show first question
             showQuestion();
+        }
+        
+        // Start background slideshow
+        function startBackgroundSlideshow() {
+            let currentIndex = 0;
+            backgroundImages[currentIndex].classList.add('active');
+            
+            backgroundInterval = setInterval(() => {
+                backgroundImages[currentIndex].classList.remove('active');
+                currentIndex = (currentIndex + 1) % backgroundImages.length;
+                backgroundImages[currentIndex].classList.add('active');
+            }, 60000); // Change every 1 minute
         }
         
         // Display the current question
@@ -430,13 +888,67 @@
         // Move to the next question
         function nextQuestion() {
             currentQuestionIndex = (currentQuestionIndex + 1) % questions.length;
+            questionNumberDisplay.textContent = currentQuestionIndex + 1;
             showQuestion();
+        }
+        
+        // Start or stop timer
+        function toggleTimer() {
+            if (!timerRunning) {
+                // Start timer
+                timerRunning = true;
+                timerBtn.textContent = "Stop Timer";
+                timerDisplay.style.display = "block";
+                
+                let timeLeft = 29;
+                timerDisplay.textContent = timeLeft;
+                
+                countdown = setInterval(() => {
+                    timeLeft--;
+                    timerDisplay.textContent = timeLeft;
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(countdown);
+                        timerRunning = false;
+                        timerDisplay.style.display = "none";
+                        quizContainer.classList.add('hidden');
+                        timeUpDisplay.classList.add('active');
+                        
+                        setTimeout(() => {
+                            timeUpDisplay.classList.remove('active');
+                            quizContainer.classList.remove('hidden');
+                        }, 3000);
+                    }
+                }, 1000);
+            } else {
+                // Stop timer
+                clearInterval(countdown);
+                timerRunning = false;
+                timerBtn.textContent = "Start Timer";
+                timerDisplay.style.display = "none";
+                quizContainer.classList.add('hidden');
+                timeUpDisplay.classList.add('active');
+                
+                setTimeout(() => {
+                    timeUpDisplay.classList.remove('active');
+                    quizContainer.classList.remove('hidden');
+                }, 3000);
+            }
         }
         
         // Event listeners
         nextBtn.addEventListener('click', nextQuestion);
         selectBtn.addEventListener('click', () => {
             questionPopup.classList.add('active');
+        });
+        timerBtn.addEventListener('click', toggleTimer);
+        
+        // Initialize the quiz when the page loads
+        window.addEventListener('DOMContentLoaded', initQuiz);
+    </script>
+</body>
+</html>
+  questionPopup.classList.add('active');
         });
         
         // Initialize the quiz when the page loads
