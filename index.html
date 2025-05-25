@@ -3,37 +3,444 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Quiz App</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Science Quiz for Secondary Students</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap">
+    <style>
+        :root {
+            --science-blue: #0a4a7a;
+            --science-green: #2ecc71;
+            --science-purple: #9b59b6;
+            --science-orange: #e67e22;
+            --science-red: #e74c3c;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .quiz-container {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 800px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .quiz-container::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+            z-index: -1;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 0 0 10px var(--science-purple);
+            font-size: 2.5rem;
+        }
+        
+        .question-container {
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        #question-text {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            line-height: 1.5;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid var(--science-green);
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .option-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            color: white;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .option-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .option-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: 0.5s;
+        }
+        
+        .option-btn:hover::before {
+            left: 100%;
+        }
+        
+        .option-btn.correct {
+            background-color: var(--science-green);
+            animation: pulse 0.5s;
+        }
+        
+        .option-btn.incorrect {
+            background-color: var(--science-red);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .plus-two {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            color: var(--science-green);
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(46, 204, 113, 0.7);
+            opacity: 0;
+            animation: fadeInOut 2s;
+            z-index: 100;
+        }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .nav-btn {
+            background-color: var(--science-purple);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .question-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        
+        .question-popup.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .question-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            max-width: 600px;
+            padding: 30px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            border: 2px solid var(--science-purple);
+        }
+        
+        .question-number {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--science-blue), var(--science-purple));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .question-number:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .question-number::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+            transition: 0.5s;
+        }
+        
+        .question-number:hover::before {
+            transform: translateX(100%);
+        }
+        
+        .science-icon {
+            position: absolute;
+            opacity: 0.1;
+            z-index: -1;
+        }
+        
+        .atom {
+            top: 10%;
+            left: 10%;
+            font-size: 5rem;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .flask {
+            bottom: 10%;
+            right: 10%;
+            font-size: 4rem;
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+    </style>
 </head>
 <body>
     <div class="quiz-container">
-        <h1>Interactive Quiz</h1>
+        <div class="science-icon atom">⚛️</div>
+        <div class="science-icon flask">🧪</div>
         
-        <div class="quiz-header">
-            <div class="score-display">
-                Score: <span id="score">0</span>
-                <div id="score-animation" class="hidden">+2</div>
-            </div>
-            <div class="question-nav">
-                <label for="question-select">Go to Question:</label>
-                <select id="question-select">
-                    <!-- Options will be added by JavaScript -->
-                </select>
-            </div>
-        </div>
+        <h1>Science Quiz Challenge</h1>
         
         <div class="question-container">
-            <h2 id="question-text">Question will appear here</h2>
+            <div id="question-text">Question will appear here</div>
             <div id="options-container" class="options-grid">
                 <!-- Options will be added by JavaScript -->
             </div>
         </div>
         
-        <audio id="correct-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3"></audio>
-        <audio id="wrong-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-audience-clapping-strongly-476.mp3"></audio>
+        <div class="nav-buttons">
+            <button id="next-btn" class="nav-btn">Next Question</button>
+            <button id="select-btn" class="nav-btn">Select Question</button>
+        </div>
+        
+        <div id="plus-two" class="plus-two hidden">+2</div>
+        
+        <audio id="correct-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3"></audio>
+        <audio id="wrong-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"></audio>
+    </div>
+    
+    <div class="question-popup" id="question-popup">
+        <div class="question-grid">
+            <!-- Question numbers will be added by JavaScript -->
+        </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // Sample questions - replace with your WPS document questions
+        const questions = [
+            {
+                question: "What is the chemical symbol for water?",
+                options: ["H2O", "CO2", "NaCl", "O2"],
+                answer: "H2O"
+            },
+            {
+                question: "Which planet is known as the Red Planet?",
+                options: ["Venus", "Mars", "Jupiter", "Saturn"],
+                answer: "Mars"
+            },
+            // Add 18 more questions following the same format
+            // ...
+            {
+                question: "What is the powerhouse of the cell?",
+                options: ["Nucleus", "Mitochondria", "Ribosome", "Chloroplast"],
+                answer: "Mitochondria"
+            }
+        ];
+        
+        // DOM Elements
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const nextBtn = document.getElementById('next-btn');
+        const selectBtn = document.getElementById('select-btn');
+        const plusTwo = document.getElementById('plus-two');
+        const correctSound = document.getElementById('correct-sound');
+        const wrongSound = document.getElementById('wrong-sound');
+        const questionPopup = document.getElementById('question-popup');
+        const questionGrid = document.querySelector('.question-grid');
+        
+        // Quiz variables
+        let currentQuestionIndex = 0;
+        
+        // Initialize the quiz
+        function initQuiz() {
+            // Populate question numbers grid
+            for (let i = 0; i < questions.length; i++) {
+                const number = document.createElement('div');
+                number.className = 'question-number';
+                number.textContent = i + 1;
+                number.addEventListener('click', () => {
+                    currentQuestionIndex = i;
+                    showQuestion();
+                    questionPopup.classList.remove('active');
+                });
+                questionGrid.appendChild(number);
+            }
+            
+            // Show first question
+            showQuestion();
+        }
+        
+        // Display the current question
+        function showQuestion() {
+            const question = questions[currentQuestionIndex];
+            questionText.textContent = question.question;
+            
+            // Clear previous options
+            optionsContainer.innerHTML = '';
+            
+            // Add new options
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.className = 'option-btn';
+                button.addEventListener('click', () => checkAnswer(option, button));
+                optionsContainer.appendChild(button);
+            });
+        }
+        
+        // Check if the selected answer is correct
+        function checkAnswer(selectedOption, button) {
+            const question = questions[currentQuestionIndex];
+            
+            // Disable all buttons
+            const allButtons = optionsContainer.querySelectorAll('.option-btn');
+            allButtons.forEach(btn => {
+                btn.disabled = true;
+            });
+            
+            if (selectedOption === question.answer) {
+                // Correct answer
+                button.classList.add('correct');
+                correctSound.play();
+                
+                // Show +2 animation
+                plusTwo.classList.remove('hidden');
+                setTimeout(() => {
+                    plusTwo.classList.add('hidden');
+                }, 2000);
+            } else {
+                // Wrong answer
+                button.classList.add('incorrect');
+                wrongSound.play();
+                
+                // Highlight correct answer
+                allButtons.forEach(btn => {
+                    if (btn.textContent === question.answer) {
+                        btn.classList.add('correct');
+                    }
+                });
+            }
+        }
+        
+        // Move to the next question
+        function nextQuestion() {
+            currentQuestionIndex = (currentQuestionIndex + 1) % questions.length;
+            showQuestion();
+        }
+        
+        // Event listeners
+        nextBtn.addEventListener('click', nextQuestion);
+        selectBtn.addEventListener('click', () => {
+            questionPopup.classList.add('active');
+        });
+        
+        // Initialize the quiz when the page loads
+        window.addEventListener('DOMContentLoaded', initQuiz);
+    </script>
 </body>
 </html>
