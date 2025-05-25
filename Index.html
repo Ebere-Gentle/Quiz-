@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Quiz App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Interactive Quiz</h1>
+        
+        <div class="quiz-header">
+            <div class="score-display">
+                Score: <span id="score">0</span>
+                <div id="score-animation" class="hidden">+2</div>
+            </div>
+            <div class="question-nav">
+                <label for="question-select">Go to Question:</label>
+                <select id="question-select">
+                    <!-- Options will be added by JavaScript -->
+                </select>
+            </div>
+        </div>
+        
+        <div class="question-container">
+            <h2 id="question-text">Question will appear here</h2>
+            <div id="options-container" class="options-grid">
+                <!-- Options will be added by JavaScript -->
+            </div>
+        </div>
+        
+        <audio id="correct-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3"></audio>
+        <audio id="wrong-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-audience-clapping-strongly-476.mp3"></audio>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
